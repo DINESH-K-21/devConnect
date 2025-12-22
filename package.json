@@ -1,0 +1,16 @@
+{
+  "name": "projectapp",
+  "version": "1.0.0",
+  "description": "myProject",
+  "main": "index.js",
+  "scripts": {
+    "start":"node src/index.js",
+    "dev":"nodemon src/index.js"
+  },
+  "author": "dinesh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
