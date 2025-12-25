@@ -6,77 +6,55 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/signup", async(req, res) => {
-
- 
-
+app.post("/signup", async (req, res) => {
   try {
-     const user = new User(req.body)
+    const user = new User(req.body);
 
-
-    await user.save()
-    res.status(201).json({message: "user created successfully!!",user:user})
+    await user.save();
+    res
+      .status(201)
+      .json({ message: "user created successfully!!", user: user });
   } catch (error) {
-
-  res.status(400).json({error: error.message  });
+    res.status(400).json({ error: error.message });
   }
 });
 
-app.get("/feed", async(req, res) => {
-
-  
+app.get("/feed", async (req, res) => {
   try {
-    const user = await User.find()
-    res.status(200).send({message:"Response sent successfully!!",user:user})
-
-   
+    const user = await User.find();
+    res
+      .status(200)
+      .send({ message: "Response sent successfully!!", user: user });
   } catch (error) {
-
-    res.send(error)
+    res.send(error);
   }
-
 });
-app.delete("/deleteuser", async(req, res) => {
-
-  
+app.delete("/deleteuser", async (req, res) => {
   try {
-    const userId = req.body.userId
-    const user = await User.findByIdAndDelete(userId)
-    res.status(200).send({message:"user deleted successfully!!",user:user})
-
-   
+    const userId = req.body.userId;
+    const user = await User.findByIdAndDelete(userId);
+    res
+      .status(200)
+      .send({ message: "user deleted successfully!!", user: user });
   } catch (error) {
-
-    res.send(error)
+    res.send(error);
   }
-
 });
-app.patch("/updateuser", async(req, res) => {
-
-  
+app.patch("/updateuser", async (req, res) => {
   try {
-    const {userId , ...updateData} = req.body
- 
-   
-    const user = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-    res.status(200).send({message:"user updated successfully!!",user:user})
+    const { userId, ...updateData } = req.body;
 
-   
+    const user = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+    res
+      .status(200)
+      .send({ message: "user updated successfully!!", user: user });
   } catch (error) {
-
-    res.send(error)
+    res.send(error);
   }
-
 });
-
-
-
-
-
 
 connectDB()
   .then(() => {
