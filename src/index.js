@@ -1,69 +1,76 @@
-const express = require("express");
-const { connectDB } = require("./config/db.js");
-const User = require("./models/userModel.js");
+import express from "express";
+import connectDB from "./config/db.js";
+import User from "./models/userModel.js";
 
 const app = express();
-
 app.use(express.json());
 
-app.post("/signup", async (req, res) => {
+app.get("/user", async (req,res) => {
+  const user = await User.find();
+  res.status(200).json(user);
+});
+
+app.post("/adduser", async(req, res) => {
   try {
     const user = new User(req.body);
+    const savedUser = await user.save();
 
-    await user.save();
-    res
-      .status(201)
-      .json({ message: "user created successfully!!", user: user });
+    res.status(201).json({
+      message: "User created successfully",
+      user: savedUser,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+app.patch("/updateUser", async (req, res) => {
+  try {
+    const { id, ...updateData } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-app.get("/feed", async (req, res) => {
+app.delete("/deleteuser", async(req, res) => {
+    const removeUserId = req.body.id;
+    
   try {
-    const user = await User.find();
-    res
-      .status(200)
-      .send({ message: "Response sent successfully!!", user: user });
-  } catch (error) {
-    res.send(error);
-  }
-});
-app.delete("/deleteuser", async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const user = await User.findByIdAndDelete(userId);
-    res
-      .status(200)
-      .send({ message: "user deleted successfully!!", user: user });
-  } catch (error) {
-    res.send(error);
-  }
-});
-app.patch("/updateuser", async (req, res) => {
-  try {
-    const { userId, ...updateData } = req.body;
+    const deletedUser =await User.findByIdAndDelete(removeUserId)
+    // const savedUser = await user.save();
 
-    const user = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
+    if (!deletedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(201).json({
+      message: "User deleted successfully",
+      user: deletedUser,
     });
-    res
-      .status(200)
-      .send({ message: "user updated successfully!!", user: user });
   } catch (error) {
-    res.send(error);
+    res.status(400).json({ error: error.message });
   }
 });
 
-connectDB()
-  .then(() => {
-    console.log("database connection established!!");
-
-    app.listen("7777", () => {
-      console.log(`server is runnin on PORT 7777`);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
+connectDB().then(() => {
+  console.log("Db connected successfully!!");
+  app.listen(7777, () => {
+    console.log("Port is Connect to 7777");
   });
+});
